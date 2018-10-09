@@ -39,6 +39,11 @@ class ActionRenderer extends Component{
     renderOutputs(){
         return this.props.item.outputs? this.props.item.outputs.map((item,index) =><OutputDiv key={index} item={item} onAddLink={this.onAddLink}></OutputDiv>):[]
     }
+
+    renderInputs(){
+        return this.props.item.inputs? this.props.item.inputs.map((item,index) =><InputDiv key={index} item={item} onAddLink={this.onAddLink}></InputDiv>):[]
+    }
+
     onEditAction=()=>{
         //EventBroker.sendEvent(EVENT_ACTION_MODAL_SHOW,this.props.item,this)
     }
@@ -61,8 +66,8 @@ class ActionRenderer extends Component{
                 </div>
                 <div className="action-split-view" >
                     <div className="inputContainer" onMouseUp={(e)=>this.onMouseUpShell(1)}>
-                        <InputDiv name="userName"></InputDiv>
-                        <InputDiv name="password"></InputDiv>
+                        {this.renderInputs()}
+
                     </div>
                     <div className="outputContainer" >
                         {this.renderOutputs()}

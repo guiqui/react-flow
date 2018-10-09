@@ -40,8 +40,8 @@ class MainRenderer extends Component{
         let w=item.w;
         let h=item.h;
         if (this.props.selectedBox && item==this.props.selectedItem){
-            w=box.w
-            h=box.h
+            w=this.props.selectedBox.w
+            h=this.props.selectedBox.h
         }
         return ( <ActionRenderer key={index}  item={item}  
                                          transform={transform} 
@@ -58,11 +58,10 @@ class MainRenderer extends Component{
             this.cache=this.calculateCache(this.props.data);
         }
         
-        if ( this.props.selectedChild){
-            let itemtoRender=this.props.selectedChild
-            let selectedIndex =this.props.data.indexOf(itemtoRender)
-            let transform=this.props.selectedChild.id==this.props.selectedItem.id?this.props.selectedTr:itemtoRender.transform;
-            this.cache[selectedIndex]=this.dorender(itemtoRender,selectedIndex,transform)
+        if ( this.props.selectedItem){
+            let selectedIndex =this.props.data.indexOf(this.props.selectedItem)
+            let transform=this.props.selectedTr;
+            this.cache[selectedIndex]=this.dorender(this.props.selectedItem,selectedIndex,transform)
         }
         return [...this.cache]
     }

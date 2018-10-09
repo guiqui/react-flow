@@ -6,11 +6,12 @@ import SpacialHelper from './helpers/SpacialHelper'
 import ViewPortController from './helpers/ViewPortController'
 import LinkManager from './links/LinkManager'
 import Matrix from './helpers/Matrix'
+import {ObjectTypes} from './Consts'
 //import Registry from 'store//';
 
 
 
-class ViewPortBackGround extends Component{
+class BackGround extends Component{
 
     shouldComponentUpdate(nextProps, nextState){
         return false
@@ -38,7 +39,7 @@ class ViewPortBackGround extends Component{
 }
 
 
-class ViewPort extends Component{
+class Flow extends Component{
     
     constructor(props){
         super(props);
@@ -115,7 +116,8 @@ class ViewPort extends Component{
         e.stopPropagation();
         this.setDraggingPosition(e)
         this.setState({dragging:true})
-        this.props.onSelectItem(parent,item);
+        if (this.props.onSelectItem)
+            this.props.onSelectItem(parent,item);
       //  this.updateSelectedInfo(parent,item)
         this.mode=Consts.MODE_RUBER_BAND_MOVE;  
 
@@ -150,13 +152,13 @@ class ViewPort extends Component{
         }
 
 
-        selectedMtx=item.matrix;
+        selectedMtx=new Matrix(item.transform);
 
         let box={id:item.id,x:0,y:0,w:item.w,h:item.h}
         this.setState({
                 viewportTr:this.state.viewportMtx.matrixToText(),
                 selectedMtx:selectedMtx,
-                selectedTr:selectedMtx.matrixToText(),
+                selectedTr:item.matrix,
                 box:box,
                 item:item,
             
@@ -246,7 +248,7 @@ class ViewPort extends Component{
 
     doMouseUp(e){
         this.setState({dragging:false})
-        if (this.props.selectedItem)
+        if (this.props.selectedItem && this.props.onChangeProperty)
             this.props.onChangeProperty(this.props.selectedItem,'position',{transform:this.state.selectedTr,box:this.state.box})
 
     }
@@ -396,12 +398,13 @@ class ViewPort extends Component{
                                         selectedMtx={this.state.selectedMtx}/> 
                             </g>
                         </svg>        
-                       {this.props.selectedItem&&(this.props.selectedItem.objType!=ObjectTypes.TYPE_LINK && this.props.selectedItem.objType!=ObjectTypes.TYPE_EVENT)?
+                        
+                       {this.props.selectedItem&&this.props.selectedItem.objType!=ObjectTypes.TYPE_LINK ?
                         (<RubberBand  
                             selectedItem={this.props.selectedItem}
                             viewport={this.state}
                             doRubberMouseDown={this.doRubberMouseDown}/>):null}
-                       <ViewPortBackGround /> 
+                       <BackGround /> 
                        
                     </div>
                 </div>
@@ -409,4 +412,4 @@ class ViewPort extends Component{
     }
 }
 
-export default  ViewPort;
+export default Flow;
