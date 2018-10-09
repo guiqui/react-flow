@@ -69,7 +69,7 @@ class Flow extends Component{
                         viewportTr:'1,0,0,1,0,0',
                         selectedMtx:null,
                         selectedTr:'',
-                        parentMtx:null,
+                        selectedItem:null,
                         box:null
                     }
         ///LOCAL VARIABLES 
@@ -87,14 +87,6 @@ class Flow extends Component{
         } else if (!this.state.dragging && state.dragging) {
           document.removeEventListener('mousemove', this.doMouseMove)
           document.removeEventListener('mouseup', this.doMouseUp)
-        }
-
-        if (prevprops.selectedItem!=this.props.selectedItem||
-            (this.props.selectedItem && this.props.selectedItem.positionHasChange)){
-
-            this.updateSelectedInfo(this.props.selectedItem)
-            if( this.props.selectedItem)
-                this.props.selectedItem.positionHasChange=false;
         }
     }
 
@@ -129,8 +121,6 @@ class Flow extends Component{
             this.setState({
                 selectedMtx:new Matrix(),
                 selectedTr:'1,0,0,1,0,0',
-                parentMtx:null,
-                parentBox:null,
                 item:item,
                 parent:null
             } )
@@ -143,8 +133,6 @@ class Flow extends Component{
             this.setState({
                 selectedMtx:selectedMtx,
                 selectedTr:selectedMtx.matrixToText(),
-                parentMtx:null,
-                parentBox:null,
                 item:item,
                 parent:null,
             } )
@@ -158,7 +146,7 @@ class Flow extends Component{
         this.setState({
                 viewportTr:this.state.viewportMtx.matrixToText(),
                 selectedMtx:selectedMtx,
-                selectedTr:item.matrix,
+                selectedTr:item.transform,
                 box:box,
                 item:item,
             
@@ -248,8 +236,8 @@ class Flow extends Component{
 
     doMouseUp(e){
         this.setState({dragging:false})
-        if (this.props.selectedItem && this.props.onChangeProperty)
-            this.props.onChangeProperty(this.props.selectedItem,'position',{transform:this.state.selectedTr,box:this.state.box})
+        if (this.props.selectedItem && this.props.onChange)
+            this.props.onChange(this.props.selectedItem,{transform:this.state.selectedTr,w:this.state.box.w,h:this.state.box.h})
 
     }
 
@@ -361,8 +349,16 @@ class Flow extends Component{
         this.draggingPositionY=e.clientY-57
     }
 
+
+    checkSelectionChange=()=>{
+        if (this.props.selectedItem!=this.state.selectedItem){
+            this.state.selectedItem=this.props.selectedItem;
+            this.updateSelectedInfo(this.props.selectedItem)
+        }
+    }
+
     render(){
-        
+        this.checkSelectionChange();
         return (<div ref="container"   onDragOver={this.onDragOver} onDrop={this.onDrop} style={{position:'relative',userSelect: 'none',width:'100%', height:'100%',outline:0 }} tabIndex="0" >  
 
                     <div id='viewport' ref="mainSvg" x={0} y={0} width="100%"   style={{position:'relative', userSelect: 'none',height:'100%' }}  
@@ -370,7 +366,7 @@ class Flow extends Component{
                         onWheel = {this.doMouseWheel}>
                          <div style={{transform:`matrix(${this.state.viewportTr})`,position:'absolute'}}> 
                             <MainRenderer   
-                                         selectedItem={this.props.selectedItem} 
+                                         selectedItem={this.state.selectedItem} 
                                          selectedTr={this.state.selectedTr} 
                                          selectedBox={this.state.box} 
                                          data={this.props.data} 

@@ -77,6 +77,11 @@ class App extends Component{
       onSelectItem=(item)=>{
         this.setState({selectedItem:item})
       }
+      onChange=(item,position)=>{
+        item.transform=position.transform;
+        item.w=position.w;
+        item.h=position.h;
+      }
     
       render() {
         return (
@@ -87,7 +92,7 @@ class App extends Component{
                     links={this.links} 
                     selectedItem={this.state.selectedItem} 
                     onSelectItem={this.onSelectItem}
-                    />
+                    onChange={this.onChange}/>
             </div>
           </div>
         );
