@@ -55,13 +55,15 @@ class Flow extends Component{
                         selectedTr:'',
                         selectedItem:null,
                         box:null}
-                        
+
         ///LOCAL VARIABLES 
         this.draggingPositionX=0;
         this.draggingPositionY=0;
         this.mode= Consts.MODE_GLOBAL_PAN;
     }
-
+      ///////////////////////
+     /// LIFECYCLE EVENT ///
+    ///////////////////////
 
     //Component update taking care of adding and removing global mouse listeners
     componentDidUpdate(prevprops, state) {
@@ -74,9 +76,9 @@ class Flow extends Component{
         }
     }
 
-    //////////////////////
-    /// MOUSE DOWN  /////
-    /////////////////////
+      ///////////////////
+     /// MOUSE EVENT ///
+    ///////////////////
     
     //When we click anywhere that is not an Object or the rubberband
     doGlobalMouseDown=(e)=>{
@@ -99,32 +101,6 @@ class Flow extends Component{
 
 
     }  
-
-    updateSelectedInfo(item){
-        if (!item){
-            this.setState({
-                selectedMtx:new Matrix(),
-                selectedTr:'1,0,0,1,0,0',
-                item:item,
-                parent:null
-            } )
-            return
-        }
-        let selectedMtx=new Matrix(item.transform);
-        let box={id:item.id,x:0,y:0,w:item.w,h:item.h}
-        this.setState({
-                viewportTr:this.state.viewportMtx.matrixToText(),
-                selectedMtx:selectedMtx,
-                selectedTr:item.transform,
-                box:box,
-                item:item,
-            
-
-            }   
-        )
-
-    }
-
 
     doRubberMouseDown=(e,mode,item)=>{
         e.stopPropagation();
@@ -201,10 +177,6 @@ class Flow extends Component{
         this.zoom(scale,cx,cy) 
     }
 
-    //////////////////////
-    /// KEY EVENTS  /////
-    /////////////////////
-
     
     ownEvent(e){
         e.preventDefault();
@@ -233,6 +205,8 @@ class Flow extends Component{
      }
 
 
+
+
      addItem=(e,parent,matrix)=>{
         let type=parseInt(e.dataTransfer.getData('type'))
         let subtype=e.dataTransfer.getData('subtype')
@@ -245,10 +219,6 @@ class Flow extends Component{
                   transform:matrix};
         this.props.onAddItem(data,parent)
      }
-    ////////////////////////////
-    //   OBJECT CONTROLLER  //
-    //////////////////////////
-
 
 
     updateSelectedItem=(newState)=>{
@@ -283,9 +253,34 @@ class Flow extends Component{
         })
     }
 
-    ///////////////////////
-    //    HELPERS     //
-    /////////////////////
+
+    ////////////////////////////
+    //   STATE MANAGEMENT   //
+    //////////////////////////
+    updateSelectedInfo(item){
+        if (!item){
+            this.setState({
+                selectedMtx:new Matrix(),
+                selectedTr:'1,0,0,1,0,0',
+                item:item,
+                parent:null
+            } )
+            return
+        }
+        let selectedMtx=new Matrix(item.transform);
+        let box={id:item.id,x:0,y:0,w:item.w,h:item.h}
+        this.setState({
+                viewportTr:this.state.viewportMtx.matrixToText(),
+                selectedMtx:selectedMtx,
+                selectedTr:item.transform,
+                box:box,
+                item:item,
+            
+
+            }   
+        )
+
+    }
     setDraggingPosition=(e)=>{
         // this.draggingPositionX=e.clientX-this.refs.container.offsetLeft;
         // this.draggingPositionY=e.clientY-this.refs.container.offsetTop;
@@ -293,7 +288,6 @@ class Flow extends Component{
         this.draggingPositionX=e.clientX-170;
         this.draggingPositionY=e.clientY-57
     }
-
 
     checkSelectionChange=()=>{
         if (this.props.selectedItem!=this.state.selectedItem){
