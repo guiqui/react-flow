@@ -44,22 +44,6 @@ class Flow extends Component{
     constructor(props){
         super(props);
 
-        //Bind functions
-        this.doMouseMove=this.doMouseMove.bind(this)
-        this.doGlobalMouseDown=this.doGlobalMouseDown.bind(this)
-        this.doMouseUp=this.doMouseUp.bind(this)
-        this.doMouseWheel=this.doMouseWheel.bind(this)
-        this.doObjectMouseDown=this.doObjectMouseDown.bind(this)
-        this.pan=this.pan.bind(this);
-        this.zoom=this.zoom.bind(this);
-        this.applyMatrix=this.applyMatrix.bind(this)
-        this.doRubberMouseDown=this.doRubberMouseDown.bind(this);
-        this.setDraggingPosition=this.setDraggingPosition.bind(this);
-        this.onDragOver=this.onDragOver.bind(this)
-        this.onDrop=this.onDrop.bind(this)
-        this.onDropIteminPage=this.onDropIteminPage.bind(this)
-        this.updateSelectedItem=this.updateSelectedItem.bind(this)
-        this.addItem=this.addItem.bind(this)
         //Init Controllers
         this.viewPortController=new ViewPortController();
 
@@ -70,8 +54,8 @@ class Flow extends Component{
                         selectedMtx:null,
                         selectedTr:'',
                         selectedItem:null,
-                        box:null
-                    }
+                        box:null}
+                        
         ///LOCAL VARIABLES 
         this.draggingPositionX=0;
         this.draggingPositionY=0;
@@ -95,7 +79,7 @@ class Flow extends Component{
     /////////////////////
     
     //When we click anywhere that is not an Object or the rubberband
-    doGlobalMouseDown(e){
+    doGlobalMouseDown=(e)=>{
         if (e.button === 0){
             this.setDraggingPosition(e)
             this.setState({dragging:true})
@@ -103,7 +87,7 @@ class Flow extends Component{
         }
     }
 
-    doObjectMouseDown(e,parent,item){
+    doObjectMouseDown=(e,parent,item)=>{
 
         e.stopPropagation();
         this.setDraggingPosition(e)
@@ -126,22 +110,7 @@ class Flow extends Component{
             } )
             return
         }
-        let selectedMtx=null
-
-        if  ((item.objType===ObjectTypes.TYPE_LINK)){
-            selectedMtx=new Matrix(item.transform);
-            this.setState({
-                selectedMtx:selectedMtx,
-                selectedTr:selectedMtx.matrixToText(),
-                item:item,
-                parent:null,
-            } )
-            return
-        }
-
-
-        selectedMtx=new Matrix(item.transform);
-
+        let selectedMtx=new Matrix(item.transform);
         let box={id:item.id,x:0,y:0,w:item.w,h:item.h}
         this.setState({
                 viewportTr:this.state.viewportMtx.matrixToText(),
@@ -157,7 +126,7 @@ class Flow extends Component{
     }
 
 
-    doRubberMouseDown(e,mode,item){
+    doRubberMouseDown=(e,mode,item)=>{
         e.stopPropagation();
         this.setDraggingPosition(e)
         this.setState({dragging:true})
@@ -179,7 +148,7 @@ class Flow extends Component{
     /// MOUSE EVENTS  ////
     /////////////////////
 
-    doMouseMove(e){
+    doMouseMove=(e)=>{
        if(this.state.dragging){
             e.stopPropagation();
             let x=e.clientX-170//this.refs.container.offsetLeft;
@@ -208,23 +177,6 @@ class Flow extends Component{
             case Consts.MODE_RUBER_BAND_RESIZE_DL     :
             case Consts.MODE_RUBER_BAND_RESIZE_DR     :
                 let newState= SpacialHelper.resizeObject(deltaX,deltaY,this.mode,this.state)
-                if (this.state.isContainer){
-                     //mark to refresh
-                    //recalculate Layout
-                    LayoutHelper.calculate(this.state.item);
-                    this.state.item.w=newState.box.w
-                    this.state.item.h=newState.box.h
-                }
-                   
-                if (this.state.isManaged) {
-                  
-                    this.state.item.w=newState.box.w;
-                    this.state.item.h=newState.box.h;
-                    this.state.item.isDirty=true
-                    LayoutHelper.calculate(this.state.parent)
-                    newState.matrix=new Matrix(this.state.item.transform)
-                }
-            
                 this.updateSelectedItem(newState);
                 break;
             }
@@ -234,14 +186,14 @@ class Flow extends Component{
     }    
 
 
-    doMouseUp(e){
+    doMouseUp=(e)=>{
         this.setState({dragging:false})
         if (this.props.selectedItem && this.props.onChange)
             this.props.onChange(this.props.selectedItem,{transform:this.state.selectedTr,w:this.state.box.w,h:this.state.box.h})
 
     }
 
-    doMouseWheel(e){
+    doMouseWheel=(e)=>{
         e.preventDefault();
         let cx=e.clientX-this.refs.container.offsetLeft;
         let cy=e.clientY-this.refs.container.offsetTop;
@@ -263,11 +215,11 @@ class Flow extends Component{
     //   DRAG & DROP EVENTS  //
     //////////////////////////
 
-    onDragOver(e){
+    onDragOver=(e)=>{
         e.preventDefault();
     }
 
-    onDrop(e){
+    onDrop=(e)=>{
         let objType=parseInt(e.dataTransfer.getData('objtype'))
         if (objType ==ObjectTypes.TYPE_PAGE 
             || objType ==ObjectTypes.TYPE_ACTION 
@@ -279,16 +231,9 @@ class Flow extends Component{
             this.addItem(e,null,matrix)
         }
      }
-     onDropIteminPage(e,parent){
-        let parentMtx=SpacialHelper.getCombineMatrix(parent.id)
-        let x=e.clientX-this.refs.container.offsetLeft;
-        let y=e.clientY-this.refs.container.offsetTop;
-        let coor=SpacialHelper.coordinatesGlobalToLocal(x,y,this.state.viewportMtx,parentMtx)
-        let matrix= `1, 0, 0, 1, ${coor.x}, ${coor.y}`
-        this.addItem(e,parent,matrix)
-     }
 
-     addItem(e,parent,matrix){
+
+     addItem=(e,parent,matrix)=>{
         let type=parseInt(e.dataTransfer.getData('type'))
         let subtype=e.dataTransfer.getData('subtype')
         let objType=parseInt(e.dataTransfer.getData('objtype'))
@@ -306,7 +251,7 @@ class Flow extends Component{
 
 
 
-    updateSelectedItem(newState){
+    updateSelectedItem=(newState)=>{
         let matrix=newState.matrix;
         newState.box?newState.box.id=this.state.box.id:null;
         let box=newState.box?newState.box:this.state.box;
@@ -321,17 +266,17 @@ class Flow extends Component{
     // VIEW PORT ZOOM & PAN //
     /////////////////////////
 
-    pan(dx, dy) {     	
+    pan=(dx, dy)=> {     	
         this.viewPortController.pan(dx, dy,this.state.viewportMtx) 
         this.applyMatrix(); 
     }
 
-    zoom(scale,cx,cy) { 
+    zoom=(scale,cx,cy)=> { 
         this.viewPortController.zoom(scale,cx,cy,this.state.viewportMtx) 
         this.applyMatrix();
     }
 
-    applyMatrix(){
+    applyMatrix=()=>{
         let newMatrix = this.state.viewportMtx.matrixToText();
         this.setState({
             viewportTr:newMatrix
@@ -341,7 +286,7 @@ class Flow extends Component{
     ///////////////////////
     //    HELPERS     //
     /////////////////////
-    setDraggingPosition(e){
+    setDraggingPosition=(e)=>{
         // this.draggingPositionX=e.clientX-this.refs.container.offsetLeft;
         // this.draggingPositionY=e.clientY-this.refs.container.offsetTop;
 
