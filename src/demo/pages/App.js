@@ -22,7 +22,7 @@ const doc={
               {id:"id1ot2","alias":"error",name:"Email Error"}
           ],
           inputs:[
-            {id:"id1ot1","alias":"success",name:"Input"},
+            {id:"id1in1","alias":"input",name:"Input"},
           ],
           transform:'1,0,0,1,250,10',
           w:180,
@@ -30,6 +30,9 @@ const doc={
       },
       {id:"id2",type:"router",
            name:"Router",
+           inputs:[
+            {id:"id2in1","alias":"input",name:"Input"},
+          ],
           outputs:[
               {id:"id2ot1","alias":"output1"},
               {id:"id2ot2","alias":"output2"}
@@ -53,12 +56,7 @@ const doc={
 
   ],
   links:[
-      {start:"id0",end:"id1"},
-      {start:"id1",end:"id3"},
-      {start:"id1ot1",end:"id2"},
-      {start:"id1ot2",end:"id2"},
-      {start:"id2ot1",end:"id4"},
-      {start:"id2ot2",end:"id4"}
+      {start:"id2",output:"id2ot1",end:"id1" ,input:"id1in1"}
 
   ]
 
@@ -89,7 +87,7 @@ class App extends Component{
             <h1>Getting Started Demo</h1>
             <div className="flow-container">
               <Flow data={doc.nodos} 
-                    links={this.links} 
+                    links={doc.links} 
                     selectedItem={this.state.selectedItem} 
                     onSelectItem={this.onSelectItem}
                     onChange={this.onChange}/>

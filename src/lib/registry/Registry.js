@@ -3,7 +3,14 @@ class Registry{
     constructor(){
         this.data={}
     }
-
+    addAll=(list)=>{
+        if(!list)
+            return;
+        this.data={}
+        list.forEach((element)=> {
+            this.data[element.id]=element;
+        })
+    } 
     add(id,obj){
         this.data[id]=obj;
     } 

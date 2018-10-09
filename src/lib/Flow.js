@@ -7,6 +7,7 @@ import ViewPortController from './helpers/ViewPortController'
 import LinkManager from './links/LinkManager'
 import Matrix from './helpers/Matrix'
 import {ObjectTypes} from './Consts'
+import Registry from './registry/Registry'
 //import Registry from 'store//';
 
 
@@ -48,13 +49,14 @@ class Flow extends Component{
         this.viewPortController=new ViewPortController();
 
         //Initialization of state
-        this.state={dragging:false,
-                        viewportMtx: new Matrix(this.props.viewportMtx),
-                        viewportTr:'1,0,0,1,0,0',
-                        selectedMtx:null,
-                        selectedTr:'',
-                        selectedItem:null,
-                        box:null}
+        this.state={data:[],
+                    dragging:false,
+                    viewportMtx: new Matrix(this.props.viewportMtx),
+                    viewportTr:'1,0,0,1,0,0',
+                    selectedMtx:null,
+                    selectedTr:'',
+                    selectedItem:null,
+                    box:null}
 
         ///LOCAL VARIABLES 
         this.draggingPositionX=0;
@@ -138,13 +140,9 @@ class Flow extends Component{
                 this.pan(deltaX,deltaY);
                 break;
             case Consts.MODE_RUBER_BAND_MOVE:
-                if (this.state.isManaged)
-                    return
                 this.updateSelectedItem(SpacialHelper.moveObject(deltaX,deltaY,this.state));
                 break;
             case Consts.MODE_RUBER_BAND_ROTATE:
-                if (this.state.isManaged || this.state.isContainer)
-                    return
                 this.updateSelectedItem(SpacialHelper.rotateObject(x,y,this.draggingPositionX,this.draggingPositionY,this.state));
                 break;
             
@@ -257,28 +255,23 @@ class Flow extends Component{
     ////////////////////////////
     //   STATE MANAGEMENT   //
     //////////////////////////
-    updateSelectedInfo(item){
+
+    updateSelectedInfo=(item)=>{
         if (!item){
             this.setState({
                 selectedMtx:new Matrix(),
                 selectedTr:'1,0,0,1,0,0',
                 item:item,
-                parent:null
-            } )
-            return
+                parent:null})
+        }else{
+            this.setState({
+                    viewportTr:this.state.viewportMtx.matrixToText(),
+                    selectedMtx:new Matrix(item.transform),
+                    selectedTr:item.transform,
+                    box:{id:item.id,x:0,y:0,w:item.w,h:item.h},
+                    item:item
+            })
         }
-        let selectedMtx=new Matrix(item.transform);
-        let box={id:item.id,x:0,y:0,w:item.w,h:item.h}
-        this.setState({
-                viewportTr:this.state.viewportMtx.matrixToText(),
-                selectedMtx:selectedMtx,
-                selectedTr:item.transform,
-                box:box,
-                item:item,
-            
-
-            }   
-        )
 
     }
     setDraggingPosition=(e)=>{
@@ -289,17 +282,20 @@ class Flow extends Component{
         this.draggingPositionY=e.clientY-57
     }
 
-    checkSelectionChange=()=>{
+    checkChanges=()=>{
         if (this.props.selectedItem!=this.state.selectedItem){
             this.state.selectedItem=this.props.selectedItem;
             this.updateSelectedInfo(this.props.selectedItem)
         }
+        if (this.props.data!=this.state.data){
+            this.state.data=this.props.data;
+            Registry.addAll(this.state.data)
+        }
     }
 
     render(){
-        this.checkSelectionChange();
+        this.checkChanges();
         return (<div ref="container"   onDragOver={this.onDragOver} onDrop={this.onDrop} style={{position:'relative',userSelect: 'none',width:'100%', height:'100%',outline:0 }} tabIndex="0" >  
-
                     <div id='viewport' ref="mainSvg" x={0} y={0} width="100%"   style={{position:'relative', userSelect: 'none',height:'100%' }}  
                         onMouseDown={this.doGlobalMouseDown} 
                         onWheel = {this.doMouseWheel}>
@@ -308,17 +304,12 @@ class Flow extends Component{
                                          selectedItem={this.state.selectedItem} 
                                          selectedTr={this.state.selectedTr} 
                                          selectedBox={this.state.box} 
-                                         data={this.props.data} 
+                                         data={this.state.data} 
                                          doObjectMouseDown={this.doObjectMouseDown} 
                                          onDropIteminPage={this.onDropIteminPage}
                                          onAddLink={this.doRubberMouseDown}/>
-                              
                         </div>
-                       <svg id="LinkManager"   style={{pointerEvents:'none',position:'absolute'}}
-                                            width="100%"
-                                            height="100%">
-
-
+                        <svg id="LinkManager"  style={{pointerEvents:'none',position:'absolute',width:'100%',height:'100%' }} >
                             <defs>
                                 <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4"
                                         orient="auto-start-reverse">
@@ -326,21 +317,16 @@ class Flow extends Component{
                                 </marker>
                             </defs>
                             <g  transform={`matrix(${this.state.viewportTr})`}>
-                            <LinkManager  links={this.props.links} containers={this.props.data} 
-                                        selectedItem={this.props.selectedItem} 
-                                        command={this.props.selectedItem?this.props.selectedItem.command:null} 
-                                        connectors={this.props.selectedItem?this.props.selectedItem.connectors:null} 
-                                        selectedMtx={this.state.selectedMtx}/> 
+                            <LinkManager  links={this.props.links}
+                                          selectedItem={this.props.selectedItem} 
+                                          selectedMtx={this.state.selectedMtx}/> 
                             </g>
-                        </svg>        
-                        
+                        </svg>
                        {this.props.selectedItem&&this.props.selectedItem.objType!=ObjectTypes.TYPE_LINK ?
-                        (<RubberBand  
-                            selectedItem={this.props.selectedItem}
-                            viewport={this.state}
-                            doRubberMouseDown={this.doRubberMouseDown}/>):null}
+                        (<RubberBand  selectedItem={this.props.selectedItem}
+                                      viewport={this.state}
+                                      doRubberMouseDown={this.doRubberMouseDown}/>):null}
                        <BackGround /> 
-                       
                     </div>
                 </div>
             )

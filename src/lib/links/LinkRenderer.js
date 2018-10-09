@@ -2,6 +2,7 @@ import React,{Component} from 'react'
 import Link from './Link'
 import LinkHelper from './LinkHelper'
 import Registry from '../registry/Registry';
+import Matrix from '../helpers/Matrix'
 import {ObjectTypes} from '../Consts'
 // import {ConnectorSides} from 'store/domain/ObjectDefinition'
 class LinkRenderer extends Component{
@@ -13,25 +14,35 @@ class LinkRenderer extends Component{
     shouldComponentUpdate(nextProps, nextState){
         return this.props.links!==nextProps.links ||
                this.props.selectedItem!==nextProps.selectedItem ||
-               this.props.selectedMtx!==nextProps.selectedMtx ||
-               this.props.command!==nextProps.command
+               this.props.selectedMtx!==nextProps.selectedMtx
 
 
     }  
-    getConnector(connectorId,selection,selectedMtx){
-        let connector=Registry.get(connectorId)
-       // let side=connector?connector.side:ConnectorSides.TYPE_RIGHT;
-       let side=connector.side
-        let coord=LinkHelper.getCoordinateFromPage(connectorId,this.props.selectedItem,this.props.selectedMtx)
-        return {cor:coord,side:side};
+    getCoordinates(link){
+        let start=Registry.get(link.start);
+        let outputIndex= start.outputs? start.outputs.indexOf(link.output):0;
+        let startTr=start==this.props.selectedItem && this.props.selectedMtx?this.props.selectedMtx:new Matrix(start.transform)
+        let end=Registry.get(link.end);
+        let endTr=end==this.props.selectedItem && this.props.selectedMtx?this.props.selectedMtx:new Matrix(end.transform)
+        let inputIndex=end.inputs? end.inputs.indexOf(link.input):0;
+        let  stCoor= {x:startTr.trx+start.w-10,y:startTr.try+outputIndex*15+42} ;
+        let  enCoor= {x:endTr.trx,y:endTr.try} ;
+        return {start:stCoor,end:enCoor};
     }
+
+  
+
     renderLink(){                         
         let result=null
+       
         if (this.props.links){
-            result=this.props.links.map((item,index)=><Link key={index} start={this.getConnector(item.start,this.props.selectedItem,this.props.selectedMtx)} 
-            end={this.getConnector(item.end,this.props.selectedItem,this.props.selectedMtx)} creating={item.end=='*'} item={item} selected={item==this.props.selectedItem}
-            color={item.color}/>)
-        }
+            result=this.props.links.map((item,index)=>{
+                let coordinates=this.getCoordinates(item)
+                return  <Link   key={index} start={coordinates.start} end={coordinates.end}  
+                                creating={item.end=='*'} item={item} selected={item==this.props.selectedItem}
+                                color={'black'}/>
+            }
+        )}
         return result;
     }
 

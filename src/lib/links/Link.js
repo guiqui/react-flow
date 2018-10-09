@@ -20,19 +20,10 @@ class Link extends Component{
         this.linkCoordinates=this.linkCoordinates.bind(this)
     }
 
-    getCase(sideA,sideB){
-        // let A = sideA==ConnectorSides.TYPE_UP || sideA==ConnectorSides.TYPE_DOWN ?SIDE_VERTICAL:SIDE_HORIZONTAL;
-        // let B = sideB==ConnectorSides.TYPE_UP || sideB==ConnectorSides.TYPE_DOWN ?SIDE_VERTICAL:SIDE_HORIZONTAL;
-        // if (A!=B){
-        //     return A==SIDE_VERTICAL?CASE_MIXED_V_H:CASE_MIXED_H_V ;
-        // }else{
-        //     return A==SIDE_VERTICAL?CASE_VERTICAL:CASE_HORIZONTAL ;
-        // }
-        return SIDE_VERTICA
-    }
+  
 
     calculatePath(coodinate){
-        return `M${this.props.start.cor.x} ${this.props.start.cor.y}  ${coodinate.cpt1.x} ${coodinate.cpt1.y} ${coodinate.cpt2.x} ${coodinate.cpt2.y} ${this.props.end.cor.x} ${this.props.end.cor.y}`;
+        return `M${this.props.start.x} ${this.props.start.y}  ${coodinate.cpt1.x} ${coodinate.cpt1.y} ${coodinate.cpt2.x} ${coodinate.cpt2.y} ${this.props.end.x} ${this.props.end.y}`;
     }
 
 
@@ -40,29 +31,9 @@ class Link extends Component{
         let cpt1={x:0,y:0}
         let cpt2={x:0,y:0}
         let middle=0;
-        let posCase = this.getCase(this.props.start.side,this.props.end.side)
-        switch(posCase){
-            case CASE_VERTICAL   :
-                middle=this.props.start.cor.y+((this.props.end.cor.y-this.props.start.cor.y)/2)
-                cpt1={x:this.props.start.cor.x,y:middle}
-                cpt2={x:this.props.end.cor.x,y:middle}
-                break
-            case CASE_MIXED_H_V      :  
-                cpt1={x:this.props.end.cor.x,y:this.props.start.cor.y}
-                cpt2=cpt1;
-                break
-            case CASE_MIXED_V_H      :  
-                cpt1={x:this.props.start.cor.x,y:this.props.end.cor.y}
-                cpt2=cpt1;
-                break
-            case CASE_HORIZONTAL :
-                middle=this.props.start.cor.x+((this.props.end.cor.x-this.props.start.cor.x)/2)
-                cpt1={x:middle,y:this.props.start.cor.y}
-                cpt2={x:middle,y:this.props.end.cor.y}
-            break
-
-
-        }
+        middle=this.props.start.x+((this.props.end.x-this.props.start.x)/2)
+        cpt1={x:middle,y:this.props.start.y}
+        cpt2={x:middle,y:this.props.end.y}
         return {cpt1:cpt1,cpt2:cpt2}
     }
     getMessageCoord(coor){
@@ -92,8 +63,8 @@ class Link extends Component{
             <path d={this.calculatePath(middleCoor)} stroke={stroke}  strokeLinejoin="round" fill="transparent" strokeWidth="3"   markerEnd="url(#arrow)" onMouseDown={this.onMouseDown} />    
             {/* <rect x={middleCoor.cpt1.x-50} y={messageCoorY-10} width='100' height='20' stroke={stroke}  fill='white' strokeWidth="2" rx="10" ry="10" onMouseDown={this.onMouseDown}/>   
             <text x={middleCoor.cpt1.x} y={messageCoorY+3} style={{"textAnchor":"middle"}} fontSize="11" fill='black'  xmlSpace="preserve">{this.props.item.label}</text> */}
-            <circle cx={this.props.start.cor.x} cy={this.props.start.cor.y} r="6" fill='white'  stroke={stroke} strokeWidth="2" />    
-            {/* <circle cx={this.props.end.cor.x} cy={this.props.end.cor.y} r="6" fill='white' stroke={stroke} strokeWidth="2"   />   */}
+            <circle cx={this.props.start.x} cy={this.props.start.y} r="6" fill='white'  stroke={stroke} strokeWidth="2" />    
+            {/* <circle cx={this.props.end.x} cy={this.props.end.y} r="6" fill='white' stroke={stroke} strokeWidth="2"   />   */}
         </g>)
     }
 }

@@ -17,13 +17,11 @@ class LinkManager extends Component{
 
         if(nextProps.links!==this.props.links || 
             nextProps.containers!==this.props.containers||
-            nextProps.selectedItem!==this.props.selectedItem
-            ||this.props.connectors!==nextProps.connectors){
+            nextProps.selectedItem!==this.props.selectedItem){
             this.prepareData(nextProps)
             return true;
         }
-        return this.props.selectedMtx!==nextProps.selectedMtx 
-        ||this.props.command!==nextProps.command 
+        return this.props.selectedMtx!==nextProps.selectedMtx
 
     }                                    
 
@@ -40,8 +38,8 @@ class LinkManager extends Component{
             result.nonSelected=links
             return result;
         }
-        if ((selectedItem.objType===ObjectTypes.TYPE_LINK)
-            ||(selectedItem.objType===ObjectTypes.TYPE_EVENT)){
+        if (selectedItem.hasOwnProperty('start') &&
+        selectedItem.hasOwnProperty('output')){
             let index=links.indexOf(selectedItem)
             let clonelinks=[...links]
             if(index>-1)

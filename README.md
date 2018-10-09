@@ -11,7 +11,7 @@
 
 
 
-A react timeline gantt component.
+A react component to build flow charts with vriable nuber of inputs or outputs.
 
 ![screencast](https://guiqui.github.io/react-timeline-gantt/demo.gif)
 
