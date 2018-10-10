@@ -49,7 +49,8 @@ class MainRenderer extends Component{
                                          w={w} 
                                          h={h}
                                          id={item.id}
-                                         onAddLink={this.props.onAddLink}
+                                         onStartLink={this.props.onStartLink}
+                                         onEndLink={this.props.onEndLink}
                                          doObjectMouseDown={this.props.doObjectMouseDown}/>)
     }
 

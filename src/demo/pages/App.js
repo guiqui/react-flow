@@ -56,8 +56,7 @@ const doc={
 
   ],
   links:[
-      {start:"id2",output:"id2ot1",end:"id1" ,input:"id1in1"}
-
+      // {start:"id2",output:"id2ot1",end:"id1" ,input:"id1in1"}
   ]
 
 
@@ -68,8 +67,9 @@ class App extends Component{
     constructor(props) {
         super(props);
         this.state={
-          selectedItem:null
-        }
+          selectedItem:null,
+          data:doc.nodos,
+          links:doc.links}
   
       }
       onSelectItem=(item)=>{
@@ -80,16 +80,21 @@ class App extends Component{
         item.w=position.w;
         item.h=position.h;
       }
+      onAddLink=(item)=>{
+        let newLinks=[...this.state.links,item]
+        this.setState({links:newLinks})
+      }
     
       render() {
         return (
           <div className="app-container">
             <h1>Getting Started Demo</h1>
             <div className="flow-container">
-              <Flow data={doc.nodos} 
-                    links={doc.links} 
+              <Flow data={this.state.data} 
+                    links={this.state.links} 
                     selectedItem={this.state.selectedItem} 
                     onSelectItem={this.onSelectItem}
+                    onAddLink={this.onAddLink}
                     onChange={this.onChange}/>
             </div>
           </div>

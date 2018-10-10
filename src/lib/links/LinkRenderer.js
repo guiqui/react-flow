@@ -20,11 +20,21 @@ class LinkRenderer extends Component{
         let start=Registry.get(link.start);
         let outputIndex= start.outputs? start.outputs.indexOf(link.output):0;
         let startTr=start==this.props.selection.item && this.props.selection.matrix?this.props.selection.matrix:new Matrix(start.transform)
-        let end=Registry.get(link.end);
-        let endTr=end==this.props.selection.item&& this.props.selection.matrix?this.props.selection.matrix:new Matrix(end.transform)
-        let inputIndex=end.inputs? end.inputs.indexOf(link.input):0;
         let  stCoor= {x:startTr.trx+start.w-10,y:startTr.try+outputIndex*15+42} ;
-        let  enCoor= {x:endTr.trx+10,y:endTr.try+inputIndex*15+42} ;
+        let endTr=null;
+        let enCoor=null;
+        if(link.end==='*'){
+            endTr=this.props.selection.matrix
+            enCoor= {x:endTr.trx,y:endTr.try} ;
+            console.log(enCoor)
+        }else{
+            let end=Registry.get(link.end);
+            endTr=end==this.props.selection.item&& this.props.selection.matrix?this.props.selection.matrix:new Matrix(end.transform)
+            let inputIndex=end.inputs? end.inputs.indexOf(link.input):0;
+            enCoor= {x:endTr.trx,y:endTr.try} ;
+        }
+      
+       
         return {start:stCoor,end:enCoor};
     }
 

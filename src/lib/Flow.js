@@ -102,16 +102,7 @@ class Flow extends Component{
     }
 
 
-    //Component update taking care of adding and removing global mouse listeners
-    // componentDidUpdate(prevprops, state) {
-    //     if (this.state.dragging && !state.dragging) {
-    //       document.addEventListener('mousemove', this.doMouseMove)
-    //       document.addEventListener('mouseup', this.doMouseUp)
-    //     } else if (!this.state.dragging && state.dragging) {
-    //       document.removeEventListener('mousemove', this.doMouseMove)
-    //       document.removeEventListener('mouseup', this.doMouseUp)
-    //     }
-    // }
+  
 
       ///////////////////
      /// MOUSE EVENT ///
@@ -148,17 +139,32 @@ class Flow extends Component{
     }
 
 
-    onAddLink=(e,obj,output)=>{
-    
-        let x=e.clientX-this.refs.container.offsetLeft;
-        let y=e.clientY-this.refs.container.offsetTop;
-        let coor=SpacialHelper.coordinatesGlobalToLocal(x,y,this.state.viewportMtx)
-
-        let linkposition=`1,0,0,1,${coor.x},${coor.y}`
+    onStartLink=(e,obj,output)=>{
+        e.stopPropagation();
+        this.setDraggingPosition(e)
+        let x=e.clientX;
+        let y=e.clientY-80;
+        let linkposition=`1,0,0,1,${x},${y}`
         let tempLink=   {start:obj.id,output:output.id,end:"*" ,input:"*"}
         let selection=this.getSelectedObjInfo(tempLink)
         selection.matrix=new Matrix(linkposition)
-        this.setState({ selection:selection})
+        selection.tranform=linkposition;
+        selection.item=tempLink;
+        this.mode=Consts.MODE_RUBER_BAND_MOVE;  
+        this.setState({dragging:true, selection:selection})
+    }
+
+
+    onEndLink=(e,obj,input)=>{
+        if (this.state.selection.type==ObjectTypes.TYPE_LINK){
+            e.stopPropagation();
+            this.state.selection.item.end=obj.id
+            this.state.selection.item.input=input.id
+            //this.props.onAddItem(data,parent)
+            if (this.props.onAddLink)
+                this.props.onAddLink(this.state.selection.item)
+            console.log('Adding')
+        }
     }
 
     ///////////////////////
@@ -327,7 +333,8 @@ class Flow extends Component{
                                          data={this.props.data} 
                                          doObjectMouseDown={this.doObjectMouseDown} 
                                          onDropIteminPage={this.onDropIteminPage}
-                                         onAddLink={this.onAddLink}/>
+                                         onEndLink={this.onEndLink}
+                                         onStartLink={this.onStartLink}/>
                         </div>
                         <svg id="LinkManager"  style={{pointerEvents:'none',position:'absolute',width:'100%',height:'100%' }} >
                             <defs>

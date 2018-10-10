@@ -5,7 +5,7 @@ import './ActionRenderer.css'
 
 function InputDiv(props){
     return  <div className="inputItemContainer"> 
-                <div className="actionConector"/>
+                <div className="actionConector" onMouseUp={(event)=>{props.onEndLink(event,props.item)}}/>
                 <div>{props.name}</div>
             </div>
 }
@@ -13,7 +13,7 @@ function InputDiv(props){
 function OutputDiv(props){
     return  <div className="outputItemContainer"> 
                 <div>{props.item.name}</div>
-                <div className="actionConector"  onMouseDown={(event)=>{props.onAddLink(event,props.item)}} />
+                <div className="actionConector"  onMouseDown={(event)=>{props.onStartLink(event,props.item)}} />
                
             </div>
 }
@@ -31,16 +31,20 @@ class ActionRenderer extends Component{
     // onCreateOutputLink(event,item){
     //     DrawComander. 
     // }
-    onAddLink=(e,output)=>{
-        this.props.onAddLink(e,this.props.item,output)
+    onStartLink=(e,output)=>{
+        this.props.onStartLink(e,this.props.item,output)
+    }
+
+    onEndLink=(e,output)=>{
+        this.props.onEndLink(e,this.props.item,output)
     }
 
     renderOutputs(){
-        return this.props.item.outputs? this.props.item.outputs.map((item,index) =><OutputDiv key={index} item={item} onAddLink={this.onAddLink}></OutputDiv>):[]
+        return this.props.item.outputs? this.props.item.outputs.map((item,index) =><OutputDiv key={index} item={item} onStartLink={this.onStartLink}></OutputDiv>):[]
     }
 
     renderInputs(){
-        return this.props.item.inputs? this.props.item.inputs.map((item,index) =><InputDiv key={index} item={item} onAddLink={this.onAddLink}></InputDiv>):[]
+        return this.props.item.inputs? this.props.item.inputs.map((item,index) =><InputDiv key={index} item={item} onEndLink={this.onEndLink}></InputDiv>):[]
     }
 
     onEditAction=()=>{
