@@ -1,5 +1,4 @@
 import React,{Component} from 'react'
-//import {ConnectorSides} from 'store/domain/ObjectDefinition'
 
 //import Consts from 'components/draw/viewPort/helpers/ViewPortConst'
 import './ActionRenderer.css'
@@ -32,8 +31,8 @@ class ActionRenderer extends Component{
     // onCreateOutputLink(event,item){
     //     DrawComander. 
     // }
-    onAddLink=(e,item)=>{
-      //  this.props.onAddLink(e,Consts.MODE_RUBER_ADD_LINK_LEFT,item)
+    onAddLink=(e,output)=>{
+        this.props.onAddLink(e,this.props.item,output)
     }
 
     renderOutputs(){

@@ -1,12 +1,11 @@
 import React,{ Component } from "react";
 import MainRenderer from './renderer/MainRenderer'
 import RubberBand from './rubberBand/RubberBand'
-import Consts from './helpers/ViewPortConst'
+import Consts,{ObjectTypes} from './helpers/ViewPortConst'
 import SpacialHelper from './helpers/SpacialHelper'
 import ViewPortController from './helpers/ViewPortController'
 import LinkManager from './links/LinkManager'
 import Matrix from './helpers/Matrix'
-import {ObjectTypes} from './Consts'
 import Registry from './registry/Registry'
 //import Registry from 'store//';
 
@@ -53,30 +52,66 @@ class Flow extends Component{
                     dragging:false,
                     viewportMtx: new Matrix(this.props.viewportMtx),
                     viewportTr:'1,0,0,1,0,0',
-                    selectedMtx:null,
-                    selectedTr:'',
-                    selectedItem:null,
-                    box:null}
+                    selection:this.getSelectedObjInfo(null)}
 
         ///LOCAL VARIABLES 
         this.draggingPositionX=0;
         this.draggingPositionY=0;
         this.mode= Consts.MODE_GLOBAL_PAN;
+        Registry.addAll(this.props.data)
     }
       ///////////////////////
-     /// LIFECYCLE EVENT ///
+     /// STATE MANAGEMENT //
     ///////////////////////
 
-    //Component update taking care of adding and removing global mouse listeners
-    componentDidUpdate(prevprops, state) {
-        if (this.state.dragging && !state.dragging) {
-          document.addEventListener('mousemove', this.doMouseMove)
-          document.addEventListener('mouseup', this.doMouseUp)
-        } else if (!this.state.dragging && state.dragging) {
-          document.removeEventListener('mousemove', this.doMouseMove)
-          document.removeEventListener('mouseup', this.doMouseUp)
+    shouldComponentUpdate(nextProps, nextState){
+        if(nextState.dragging!==this.state.dragging ){
+            this.addRemoveMouseListener(nextState,this.state)
+        }
+        if (nextProps.selectedItem!==this.props.selectedItem){
+            //force state to be new selection
+            nextState.selection=this.getSelectedObjInfo(nextProps.selectedItem)
+        }
+        if (nextProps.data!==this.props.data){
+            this.calcNewDataState(nextProps.data)
+        }
+        return true;
+    }     
+
+
+    calcNewDataState=(data)=>{
+            Registry.addAll(data)
+    }
+    
+
+    addRemoveMouseListener = (newState , oldState) => {
+        if (newState.dragging && !oldState.dragging) {
+            document.addEventListener('mousemove', this.doMouseMove)
+            document.addEventListener('mouseup', this.doMouseUp)
+        } else if (!newState.dragging && oldState.dragging) {
+            document.removeEventListener('mousemove', this.doMouseMove)
+            document.removeEventListener('mouseup', this.doMouseUp)
         }
     }
+
+    getSelectedObjInfo=(item)=>{
+        let matrix=item?new Matrix(item.transform):new Matrix();
+        let box=item?{id:item.id,x:0,y:0,w:item.w,h:item.h}:{id:"",x:0,y:0,w:0,h:0};
+        let type=item?this.getObjType(item):ObjectTypes.TYPE_ITEM;
+        return {item:item,matrix:matrix,transform:matrix.matrixToText(),box:box,type:type}
+    }
+
+
+    //Component update taking care of adding and removing global mouse listeners
+    // componentDidUpdate(prevprops, state) {
+    //     if (this.state.dragging && !state.dragging) {
+    //       document.addEventListener('mousemove', this.doMouseMove)
+    //       document.addEventListener('mouseup', this.doMouseUp)
+    //     } else if (!this.state.dragging && state.dragging) {
+    //       document.removeEventListener('mousemove', this.doMouseMove)
+    //       document.removeEventListener('mouseup', this.doMouseUp)
+    //     }
+    // }
 
       ///////////////////
      /// MOUSE EVENT ///
@@ -109,17 +144,21 @@ class Flow extends Component{
         this.setDraggingPosition(e)
         this.setState({dragging:true})
         this.mode=mode; 
-        if (mode===Consts.MODE_RUBER_ADD_LINK_LEFT || mode===Consts.MODE_RUBER_ADD_LINK_RIGHT)
-        {
-            let x=e.clientX-this.refs.container.offsetLeft;
-            let y=e.clientY-this.refs.container.offsetTop;
-            let coor=SpacialHelper.coordinatesGlobalToLocal(x,y,this.state.viewportMtx)
-            let side = mode===Consts.MODE_RUBER_ADD_LINK_LEFT?ConnectorSides.TYPE_LEFT:ConnectorSides.TYPE_RIGHT;
-            this.mode=Consts.MODE_RUBER_BAND_MOVE; 
-            let linkposition=`1,0,0,1,${coor.x},${coor.y}`
-            let data={objType:ObjectTypes.TYPE_LINK,startItem:item,startSide:side,transform:linkposition};
-            this.props.onAddItem(data,parent)
-        }
+        
+    }
+
+
+    onAddLink=(e,obj,output)=>{
+    
+        let x=e.clientX-this.refs.container.offsetLeft;
+        let y=e.clientY-this.refs.container.offsetTop;
+        let coor=SpacialHelper.coordinatesGlobalToLocal(x,y,this.state.viewportMtx)
+
+        let linkposition=`1,0,0,1,${coor.x},${coor.y}`
+        let tempLink=   {start:obj.id,output:output.id,end:"*" ,input:"*"}
+        let selection=this.getSelectedObjInfo(tempLink)
+        selection.matrix=new Matrix(linkposition)
+        this.setState({ selection:selection})
     }
 
     ///////////////////////
@@ -163,7 +202,7 @@ class Flow extends Component{
     doMouseUp=(e)=>{
         this.setState({dragging:false})
         if (this.props.selectedItem && this.props.onChange)
-            this.props.onChange(this.props.selectedItem,{transform:this.state.selectedTr,w:this.state.box.w,h:this.state.box.h})
+            this.props.onChange(this.props.selectedItem,{transform:this.state.selection.matrix.matrixToText(),w:this.state.selection.box.w,h:this.state.selection.box.h})
 
     }
 
@@ -221,13 +260,13 @@ class Flow extends Component{
 
     updateSelectedItem=(newState)=>{
         let matrix=newState.matrix;
-        newState.box?newState.box.id=this.state.box.id:null;
-        let box=newState.box?newState.box:this.state.box;
-        this.setState({
-            selectedMtx:matrix,
-            selectedTr:matrix.matrixToText(),
-            box:box
-        })
+       // newState.box?newState.box.id=this.state.box.id:null;
+        let box=newState.box?newState.box:this.state.selection.box;
+        let selection={...this.state.selection}
+        selection.matrix=matrix;
+        selection.transform=matrix.matrixToText()
+        selection.box=box;
+        this.setState({selection:selection})
     }
   
     //////////////////////////
@@ -250,30 +289,22 @@ class Flow extends Component{
             viewportTr:newMatrix
         })
     }
-
-
-    ////////////////////////////
-    //   STATE MANAGEMENT   //
-    //////////////////////////
-
-    updateSelectedInfo=(item)=>{
-        if (!item){
-            this.setState({
-                selectedMtx:new Matrix(),
-                selectedTr:'1,0,0,1,0,0',
-                item:item,
-                parent:null})
-        }else{
-            this.setState({
-                    viewportTr:this.state.viewportMtx.matrixToText(),
-                    selectedMtx:new Matrix(item.transform),
-                    selectedTr:item.transform,
-                    box:{id:item.id,x:0,y:0,w:item.w,h:item.h},
-                    item:item
-            })
+      /////////////////////////
+     //       HELPERS       //
+    /////////////////////////
+    getObjType(item){
+        if (item.hasOwnProperty('start') 
+            && item.hasOwnProperty('output')
+            && item.hasOwnProperty('end')
+            && item.hasOwnProperty('input')){
+                return ObjectTypes.TYPE_LINK;
         }
-
+        return ObjectTypes.TYPE_ITEM;
     }
+
+
+
+
     setDraggingPosition=(e)=>{
         // this.draggingPositionX=e.clientX-this.refs.container.offsetLeft;
         // this.draggingPositionY=e.clientY-this.refs.container.offsetTop;
@@ -282,32 +313,21 @@ class Flow extends Component{
         this.draggingPositionY=e.clientY-57
     }
 
-    checkChanges=()=>{
-        if (this.props.selectedItem!=this.state.selectedItem){
-            this.state.selectedItem=this.props.selectedItem;
-            this.updateSelectedInfo(this.props.selectedItem)
-        }
-        if (this.props.data!=this.state.data){
-            this.state.data=this.props.data;
-            Registry.addAll(this.state.data)
-        }
-    }
+    
 
     render(){
-        this.checkChanges();
+
         return (<div ref="container"   onDragOver={this.onDragOver} onDrop={this.onDrop} style={{position:'relative',userSelect: 'none',width:'100%', height:'100%',outline:0 }} tabIndex="0" >  
                     <div id='viewport' ref="mainSvg" x={0} y={0} width="100%"   style={{position:'relative', userSelect: 'none',height:'100%' }}  
                         onMouseDown={this.doGlobalMouseDown} 
                         onWheel = {this.doMouseWheel}>
                          <div style={{transform:`matrix(${this.state.viewportTr})`,position:'absolute'}}> 
                             <MainRenderer   
-                                         selectedItem={this.state.selectedItem} 
-                                         selectedTr={this.state.selectedTr} 
-                                         selectedBox={this.state.box} 
-                                         data={this.state.data} 
+                                        selection={this.state.selection}
+                                         data={this.props.data} 
                                          doObjectMouseDown={this.doObjectMouseDown} 
                                          onDropIteminPage={this.onDropIteminPage}
-                                         onAddLink={this.doRubberMouseDown}/>
+                                         onAddLink={this.onAddLink}/>
                         </div>
                         <svg id="LinkManager"  style={{pointerEvents:'none',position:'absolute',width:'100%',height:'100%' }} >
                             <defs>
@@ -318,12 +338,11 @@ class Flow extends Component{
                             </defs>
                             <g  transform={`matrix(${this.state.viewportTr})`}>
                             <LinkManager  links={this.props.links}
-                                          selectedItem={this.props.selectedItem} 
-                                          selectedMtx={this.state.selectedMtx}/> 
+                                          selection={this.state.selection}/> 
                             </g>
                         </svg>
-                       {this.props.selectedItem&&this.props.selectedItem.objType!=ObjectTypes.TYPE_LINK ?
-                        (<RubberBand  selectedItem={this.props.selectedItem}
+                       {this.props.selectedItem&&this.state.selection.type!=ObjectTypes.TYPE_LINK ?
+                        (<RubberBand  selection={this.props.selectedItem}
                                       viewport={this.state}
                                       doRubberMouseDown={this.doRubberMouseDown}/>):null}
                        <BackGround /> 

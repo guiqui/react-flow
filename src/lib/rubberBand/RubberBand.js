@@ -24,7 +24,8 @@ class RubberBand extends Component{
     calculateCoordinates(){
 
         //get box here
-        let box=SpacialHelper.calculateRubberBandPosition(this.props.viewport.selectedMtx,this.props.viewport.box, this.props.viewport.viewportMtx,this.props.viewport.parentMtx)
+
+        let box=SpacialHelper.calculateRubberBandPosition(this.props.viewport.selection.matrix,this.props.viewport.selection.box, this.props.viewport.viewportMtx,null)
         return {x:box.x,y:box.y,w:box.w,h:box.h,transform:box.transform}
     }
 
@@ -78,23 +79,7 @@ class RubberBand extends Component{
                                 onMouseDown={(event)=>{this.props.doRubberMouseDown(event,Consts.MODE_RUBER_BAND_RESIZE_DR)}} 
                                 /> 
 
-
-                        <circle ref="ruberbandEvent" className="rubberConnector" 
-
-                            cx={coordinates.x+coordinates.w+2}
-                            cy={coordinates.y+(coordinates.h/2)} 
-                            r={6}
-                            
-                            onMouseDown={(event)=>{this.props.doRubberMouseDown(event,Consts.MODE_RUBER_ADD_LINK_RIGHT)}} /> 
-                        
-                        <circle ref="ruberbandEvent" className="rubberConnector" 
-
-                            cx={coordinates.x-2}
-                            cy={coordinates.y+(coordinates.h/2)} 
-                            r={6}
-                            onMouseDown={(event)=>{this.props.doRubberMouseDown(event,Consts.MODE_RUBER_ADD_LINK_LEFT)}} /> 
-
-                        <line x1={coordinates.x+((coordinates.w)/2)}  
+                        {/* <line x1={coordinates.x+((coordinates.w)/2)}  
                             y1={coordinates.y} 
                             x2={coordinates.x+((coordinates.w)/2)}  
                             y2={coordinates.y-((coordinates.h)/2)}  
@@ -102,7 +87,7 @@ class RubberBand extends Component{
                         <circle cx={coordinates.x+((coordinates.w)/2)} 
                                 cy={coordinates.y-((coordinates.h)/2)}  
                                 r={7} className="rubberBandHandle" 
-                                onMouseDown={(event)=>{this.props.doRubberMouseDown(event,Consts.MODE_RUBER_BAND_ROTATE)}} />
+                                onMouseDown={(event)=>{this.props.doRubberMouseDown(event,Consts.MODE_RUBER_BAND_ROTATE)}} /> */}
 
                 </g>         
             </svg>  

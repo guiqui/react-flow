@@ -211,8 +211,8 @@ class SpacialHelper {
 
 
     static moveObject(dx, dy,state) {  
-        let increment=SpacialHelper.transfromIncrement(dx, dy,state.viewportMtx,state.selectedMtx)
-        let objMatrix=state.selectedMtx
+        let increment=SpacialHelper.transfromIncrement(dx, dy,state.viewportMtx,state.selection.matrix)
+        let objMatrix=state.selection.matrix
         objMatrix=objMatrix.translate(-increment.dx, -increment.dy) 
         return {matrix:objMatrix,box:null};
 
@@ -256,13 +256,13 @@ class SpacialHelper {
 
         let p1 ={x:lastx,y:lasty};
         let p2 ={x:x,y:y }
-        let center=SpacialHelper.transformToViewPort(cx,cy,state.viewportMtx,state.selectedMtx,state.parentMtx)
+        let center=SpacialHelper.transformToViewPort(cx,cy,state.viewportMtx,state.selection.matrix,state.parentMtx)
         
         let direction=SpacialHelper.getRotationDirection(p1,p2,center);
         let angle= SpacialHelper.calculateRotationsAngle(p1,center,p2)
         angle= direction == Consts.CLOCKWISE ?angle :-angle;
         
-        let objMatrix=state.selectedMtx
+        let objMatrix=state.selection.matrix
         //let inc=2.0;
         
         objMatrix=objMatrix.translate(cx,cy)
@@ -282,9 +282,9 @@ class SpacialHelper {
         }
         
         //To Calculate the tramsformer right scale to increase
-        let increment=SpacialHelper.transfromIncrement(dx, dy,state.viewportMtx,state.selectedMtx)
-        let oldpoint=SpacialHelper.transfromIncrement(box.x+box.w-cx, box.y+box.h-cy,state.viewportMtx,state.selectedMtx);
-        let newpoint=SpacialHelper.transfromIncrement(box.x+box.w-increment.dx-cx, box.y+box.h-increment.dy-cy,state.viewportMtx,state.selectedMtx);
+        let increment=SpacialHelper.transfromIncrement(dx, dy,state.viewportMtx,state.selection.matrix)
+        let oldpoint=SpacialHelper.transfromIncrement(box.x+box.w-cx, box.y+box.h-cy,state.viewportMtx,state.selection.matrix);
+        let newpoint=SpacialHelper.transfromIncrement(box.x+box.w-increment.dx-cx, box.y+box.h-increment.dy-cy,state.viewportMtx,state.selection.matrix);
 
         if (box.x+box.w-increment.dx < cx)
             return;
@@ -295,7 +295,7 @@ class SpacialHelper {
         let ix=newpoint.dx/oldpoint.dx
         let iy=newpoint.dy/oldpoint.dy
 
-        let objMatrix=state.selectedMtx
+        let objMatrix=state.selection.matrix
         objMatrix=objMatrix.translate(cx,cy)
         objMatrix=objMatrix.scale(ix,iy)
         objMatrix=objMatrix.translate(-cx,-cy)
@@ -303,15 +303,15 @@ class SpacialHelper {
     }
 
     static resizeObject(dx, dy,side,state){
-        let box=state.box;
+        let box=state.selection.box;
         let ix=0;
         let iy=0;
 
         //To Calculate the tramsformer right scale to increase
-        let increment=SpacialHelper.transfromIncrement(dx, dy,state.viewportMtx,state.selectedMtx)
+        let increment=SpacialHelper.transfromIncrement(dx, dy,state.viewportMtx,state.selection.matrix)
         let fdx=0;
         let fdy=0;
-        let objMatrix=state.selectedMtx;
+        let objMatrix=state.selection.matrix;
         switch (side){
             case Consts.MODE_RUBER_BAND_RESIZE_UL     :
                 ix=-increment.dx;

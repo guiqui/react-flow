@@ -1,6 +1,6 @@
 import React,{Component} from 'react'
 import LinkRenderer from './LinkRenderer'
- import {ObjectTypes} from '../Consts'
+import {ObjectTypes} from '../helpers/ViewPortConst'
 import Registry from '../registry/Registry';
 import './LinkManager.css'
 
@@ -16,12 +16,11 @@ class LinkManager extends Component{
     shouldComponentUpdate(nextProps, nextState){
 
         if(nextProps.links!==this.props.links || 
-            nextProps.containers!==this.props.containers||
-            nextProps.selectedItem!==this.props.selectedItem){
+            nextProps.selection!==this.props.selection){
             this.prepareData(nextProps)
             return true;
         }
-        return this.props.selectedMtx!==nextProps.selectedMtx
+        return false;
 
     }                                    
 
@@ -38,8 +37,7 @@ class LinkManager extends Component{
             result.nonSelected=links
             return result;
         }
-        if (selectedItem.hasOwnProperty('start') &&
-        selectedItem.hasOwnProperty('output')){
+        if (this.props.selection.type==ObjectTypes.TYPE_LINK ){
             let index=links.indexOf(selectedItem)
             let clonelinks=[...links]
             if(index>-1)
@@ -79,7 +77,7 @@ class LinkManager extends Component{
 
     renderSelected(){
         if (this.props.selectedItem){
-            return  <LinkRenderer selectedItem={this.props.selectedItem} command={this.props.command} selectedMtx={this.props.selectedMtx} links={this.links.selected} />
+            return  <LinkRenderer selection={this.props.selection} links={this.links.selected} />
         }
     }
 
@@ -87,7 +85,7 @@ class LinkManager extends Component{
     render(){
         return ( 
             <g>
-                <LinkRenderer selectedItem={this.props.selectedItem} links={this.links.nonSelected}   />
+                <LinkRenderer selection={this.props.selection} links={this.links.nonSelected}   />
                {this.renderSelected()}
             </g>
         )

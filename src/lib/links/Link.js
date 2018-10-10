@@ -60,10 +60,10 @@ class Link extends Component{
         let middleCoor=this.linkCoordinates();
         let messageCoorY=this.getMessageCoord(middleCoor)
         return (<g    pointerEvents={this.props.creating?"none":"all"} >   
-            <path d={this.calculatePath(middleCoor)} stroke={stroke}  strokeLinejoin="round" fill="transparent" strokeWidth="3"   markerEnd="url(#arrow)" onMouseDown={this.onMouseDown} />    
+            <path d={this.calculatePath(middleCoor)} stroke={stroke}  strokeLinejoin="round" fill="transparent" strokeWidth="2"   markerEnd="url(#arrow)" onMouseDown={this.onMouseDown} />    
             {/* <rect x={middleCoor.cpt1.x-50} y={messageCoorY-10} width='100' height='20' stroke={stroke}  fill='white' strokeWidth="2" rx="10" ry="10" onMouseDown={this.onMouseDown}/>   
             <text x={middleCoor.cpt1.x} y={messageCoorY+3} style={{"textAnchor":"middle"}} fontSize="11" fill='black'  xmlSpace="preserve">{this.props.item.label}</text> */}
-            <circle cx={this.props.start.x} cy={this.props.start.y} r="6" fill='white'  stroke={stroke} strokeWidth="2" />    
+            <circle cx={this.props.start.x} cy={this.props.start.y} r="5" fill='white'  stroke={stroke} strokeWidth="2" />    
             {/* <circle cx={this.props.end.x} cy={this.props.end.y} r="6" fill='white' stroke={stroke} strokeWidth="2"   />   */}
         </g>)
     }

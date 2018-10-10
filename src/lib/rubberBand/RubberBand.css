@@ -13,7 +13,7 @@
 }
 
 .rubberBandHandle{
-    fill:rgb(187, 187, 190);
+    fill:white;
     pointer-events:fill;
     stroke:#ee63f3;
     stroke-width:1;

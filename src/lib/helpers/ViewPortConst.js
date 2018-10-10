@@ -29,5 +29,11 @@ const Consts={
     RUBBER_BAND_EVENT_HANDLE_SIZE_HALF:5,
 }
 
+export const ObjectTypes={
+    TYPE_ITEM  :0,
+    TYPE_LINK  :1,
+
+}
+
 export default Consts
 

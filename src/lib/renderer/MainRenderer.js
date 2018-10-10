@@ -1,4 +1,5 @@
 import React,{Component} from 'react'
+import {ObjectTypes} from '../helpers/ViewPortConst'
 import ActionRenderer from './action/ActionRenderer'
 
 
@@ -39,9 +40,9 @@ class MainRenderer extends Component{
     dorender(item,index,transform){
         let w=item.w;
         let h=item.h;
-        if (this.props.selectedBox && item==this.props.selectedItem){
-            w=this.props.selectedBox.w
-            h=this.props.selectedBox.h
+        if (this.props.selection.box && item==this.props.selection.item){
+            w=this.props.selection.box.w
+            h=this.props.selection.box.h
         }
         return ( <ActionRenderer key={index}  item={item}  
                                          transform={transform} 
@@ -58,10 +59,10 @@ class MainRenderer extends Component{
             this.cache=this.calculateCache(this.props.data);
         }
         
-        if ( this.props.selectedItem){
-            let selectedIndex =this.props.data.indexOf(this.props.selectedItem)
-            let transform=this.props.selectedTr;
-            this.cache[selectedIndex]=this.dorender(this.props.selectedItem,selectedIndex,transform)
+        if ( this.props.selection.item&&this.props.selection.type!=ObjectTypes.TYPE_LINK){ //and not a link
+            let selectedIndex =this.props.data.indexOf(this.props.selection.item)
+            let transform=this.props.selection.transform;
+            this.cache[selectedIndex]=this.dorender(this.props.selection.item,selectedIndex,transform)
         }
         return [...this.cache]
     }
