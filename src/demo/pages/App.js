@@ -43,6 +43,10 @@ const doc = {
       id: 'id3',
       type: 'logger',
       name: 'Logger',
+      outputs: [
+        { id: 'id3ot1', alias: 'output1' },
+        { id: 'id3ot2', alias: 'output2' }
+      ],
       transform: '1,0,0,1,400,350',
       w: 180,
       h: 100

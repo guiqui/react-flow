@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import Consts from "../helpers/ViewPortConst";
-import SpacialHelper from "../helpers/SpacialHelper";
-import "./RubberBand.css";
+import React, { Component } from 'react';
+import Consts, { ObjectTypes } from '../helpers/ViewPortConst';
+import SpacialHelper from '../helpers/SpacialHelper';
+import './RubberBand.css';
 
 class RubberBand extends Component {
   constructor(props) {
@@ -30,6 +30,10 @@ class RubberBand extends Component {
 
   render() {
     let coordinates = this.calculateCoordinates();
+    const { selection } = this.props;
+    if (!selection) return null;
+    if (selection.type != ObjectTypes.TYPE_LINK) return null;
+
     return (
       <svg
         id="Rubberband"
@@ -58,10 +62,7 @@ class RubberBand extends Component {
             width={Consts.RUBBER_BAND_HANDLE_SIZE}
             height={Consts.RUBBER_BAND_HANDLE_SIZE}
             onMouseDown={(event) => {
-              this.props.doRubberMouseDown(
-                event,
-                Consts.MODE_RUBER_BAND_RESIZE_UL
-              );
+              this.props.doRubberMouseDown(event, Consts.MODE_RUBER_BAND_RESIZE_UL);
             }}
           />
           <rect
@@ -72,10 +73,7 @@ class RubberBand extends Component {
             width={Consts.RUBBER_BAND_HANDLE_SIZE}
             height={Consts.RUBBER_BAND_HANDLE_SIZE}
             onMouseDown={(event) => {
-              this.props.doRubberMouseDown(
-                event,
-                Consts.MODE_RUBER_BAND_RESIZE_UR
-              );
+              this.props.doRubberMouseDown(event, Consts.MODE_RUBER_BAND_RESIZE_UR);
             }}
           />
           <rect
@@ -86,10 +84,7 @@ class RubberBand extends Component {
             width={Consts.RUBBER_BAND_HANDLE_SIZE}
             height={Consts.RUBBER_BAND_HANDLE_SIZE}
             onMouseDown={(event) => {
-              this.props.doRubberMouseDown(
-                event,
-                Consts.MODE_RUBER_BAND_RESIZE_DL
-              );
+              this.props.doRubberMouseDown(event, Consts.MODE_RUBER_BAND_RESIZE_DL);
             }}
           />
           <rect
@@ -100,10 +95,7 @@ class RubberBand extends Component {
             width={Consts.RUBBER_BAND_HANDLE_SIZE}
             height={Consts.RUBBER_BAND_HANDLE_SIZE}
             onMouseDown={(event) => {
-              this.props.doRubberMouseDown(
-                event,
-                Consts.MODE_RUBER_BAND_RESIZE_DR
-              );
+              this.props.doRubberMouseDown(event, Consts.MODE_RUBER_BAND_RESIZE_DR);
             }}
           />
         </g>

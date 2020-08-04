@@ -261,6 +261,7 @@ class Flow extends Component {
       viewportTr: newMatrix
     });
   };
+
   /////////////////////////
   //       HELPERS       //
   /////////////////////////
@@ -305,27 +306,20 @@ class Flow extends Component {
           onMouseDown={this.doGlobalMouseDown}
           onWheel={this.doMouseWheel}
         >
-          <div
-            style={{
-              transform: `matrix(${viewportTr})`,
-              position: 'absolute'
-            }}
-          >
-            <MainRenderer
-              selection={this.state.selection}
-              data={this.props.data}
-              doObjectMouseDown={this.doObjectMouseDown}
-              onDropIteminPage={this.onDropIteminPage}
-              onEndLink={this.onEndLink}
-              onStartLink={this.onStartLink}
-            />
-          </div>
+          <MainRenderer
+            transform={viewportTr}
+            selection={this.state.selection}
+            data={this.props.data}
+            doObjectMouseDown={this.doObjectMouseDown}
+            onDropIteminPage={this.onDropIteminPage}
+            onEndLink={this.onEndLink}
+            onStartLink={this.onStartLink}
+          />
 
           <LinkManager transform={viewportTr} links={this.props.links} selection={this.state.selection} />
 
-          {this.props.selectedItem && this.state.selection.type != ObjectTypes.TYPE_LINK ? (
-            <RubberBand selection={this.props.selectedItem} viewport={this.state} doRubberMouseDown={this.doRubberMouseDown} />
-          ) : null}
+          <RubberBand selection={this.props.selectedItem} viewport={this.state} doRubberMouseDown={this.doRubberMouseDown} />
+
           <BackGround />
         </div>
       </div>
