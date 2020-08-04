@@ -8,6 +8,7 @@ import LinkManager from './links/LinkManager';
 import Matrix from './helpers/Matrix';
 import Registry from './registry/Registry';
 import BackGround from './background/BackGround';
+import LinkHelper from './links/LinkHelper';
 //import Registry from 'store//';
 
 class Flow extends Component {
@@ -111,11 +112,11 @@ class Flow extends Component {
     this.setDraggingPosition(e);
     let x = e.clientX;
     let y = e.clientY - 80;
-    let linkposition = `1,0,0,1,${x},${y}`;
     let tempLink = { start: obj.id, output: output.id, end: '*', input: '*' };
     let selection = this.getSelectedObjInfo(tempLink);
-    selection.matrix = new Matrix(linkposition);
-    selection.tranform = linkposition;
+    const matrix = LinkHelper.getPosFromObjectOutPut(obj, output.id);
+    selection.matrix = matrix;
+    selection.tranform = matrix.matrixToText();
     selection.item = tempLink;
     this.mode = Consts.MODE_RUBER_BAND_MOVE;
     this.setState({ dragging: true, selection: selection });

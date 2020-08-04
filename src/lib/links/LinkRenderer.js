@@ -14,7 +14,14 @@ class LinkRenderer extends Component {
   }
   getCoordinates(link) {
     let start = Registry.get(link.start);
-    let outputIndex = start.outputs ? start.outputs.indexOf(link.output) : 0;
+    debugger;
+    let outputIndex = start.outputs
+      ? start.outputs
+          .map((x) => {
+            return x.id;
+          })
+          .indexOf(link.output)
+      : 0;
     let startTr =
       start == this.props.selection.item && this.props.selection.matrix ? this.props.selection.matrix : new Matrix(start.transform);
     let stCoor = {

@@ -62,7 +62,6 @@ class Link extends Component {
           strokeLinejoin="round"
           fill="transparent"
           strokeWidth="2"
-          //   markerEnd="url(#arrow)"
           onMouseDown={this.onMouseDown}
         />
         {/* <rect x={middleCoor.cpt1.x-50} y={messageCoorY-10} width='100' height='20' stroke={stroke}  fill='white' strokeWidth="2" rx="10" ry="10" onMouseDown={this.onMouseDown}/>   
