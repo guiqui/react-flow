@@ -9,7 +9,7 @@ import Matrix from './helpers/Matrix';
 import Registry from './registry/Registry';
 import BackGround from './background/BackGround';
 import LinkHelper from './links/LinkHelper';
-//import Registry from 'store//';
+import { withTransform, ViewPortElement } from 'libs/renderer/HOCElement';
 
 class Flow extends Component {
   constructor(props) {
@@ -70,6 +70,7 @@ class Flow extends Component {
     let box = item ? { id: item.id, x: 0, y: 0, w: item.w, h: item.h } : { id: '', x: 0, y: 0, w: 0, h: 0 };
     let type = item ? this.getObjType(item) : ObjectTypes.TYPE_ITEM;
     return {
+      id: item ? item.id : -1,
       item: item,
       matrix: matrix,
       transform: matrix.matrixToText(),
@@ -96,7 +97,10 @@ class Flow extends Component {
     this.setDraggingPosition(e);
     this.setState({ dragging: true });
     if (this.props.onSelectItem) this.props.onSelectItem(parent, item);
+    this.selection = item;
     //this.updateSelectedInfo(parent, item);
+    let selection = this.getSelectedObjInfo(item);
+    this.setState({ dragging: true, selection: selection });
     this.mode = Consts.MODE_RUBER_BAND_MOVE;
   };
 
@@ -105,32 +109,6 @@ class Flow extends Component {
     this.setDraggingPosition(e);
     this.setState({ dragging: true });
     this.mode = mode;
-  };
-
-  onStartLink = (e, obj, output) => {
-    e.stopPropagation();
-    this.setDraggingPosition(e);
-    let x = e.clientX;
-    let y = e.clientY - 80;
-    let tempLink = { start: obj.id, output: output.id, end: '*', input: '*' };
-    let selection = this.getSelectedObjInfo(tempLink);
-    const matrix = LinkHelper.getPosFromObjectOutPut(obj, output.id);
-    selection.matrix = matrix;
-    selection.tranform = matrix.matrixToText();
-    selection.item = tempLink;
-    this.mode = Consts.MODE_RUBER_BAND_MOVE;
-    this.setState({ dragging: true, selection: selection });
-  };
-
-  onEndLink = (e, obj, input) => {
-    if (this.state.selection.type == ObjectTypes.TYPE_LINK) {
-      e.stopPropagation();
-      this.state.selection.item.end = obj.id;
-      this.state.selection.item.input = input.id;
-      if (this.props.onAddLink) this.props.onAddLink(this.state.selection.item);
-      if (this.props.onSelectItem) this.props.onSelectItem(null, null);
-      this.setState;
-    }
   };
 
   ///////////////////////
@@ -281,8 +259,25 @@ class Flow extends Component {
     this.draggingPositionY = e.clientY - 57;
   };
 
+  renderChildren = () => {
+    let selection = this.state.selection;
+    const { children } = this.props;
+    const result = children.map((item, i) => {
+      console.log(item.id);
+      console.log(`s:${selection.id}  id:${i} `);
+      const transform = selection.id == i ? selection.transform : null;
+      return (
+        <ViewPortElement id={i} key={i} transform={transform} doObjectMouseDown={this.doObjectMouseDown}>
+          {item}
+        </ViewPortElement>
+      );
+    });
+    return result;
+  };
+
   render() {
-    const { viewportTr } = this.state;
+    const { viewportTr, selection } = this.state;
+
     return (
       <div
         ref="container"
@@ -307,21 +302,16 @@ class Flow extends Component {
           onMouseDown={this.doGlobalMouseDown}
           onWheel={this.doMouseWheel}
         >
-          <MainRenderer
-            transform={viewportTr}
-            selection={this.state.selection}
-            data={this.props.data}
-            doObjectMouseDown={this.doObjectMouseDown}
-            onDropIteminPage={this.onDropIteminPage}
-            onEndLink={this.onEndLink}
-            onStartLink={this.onStartLink}
-          />
+          <div
+            style={{
+              transform: `matrix(${viewportTr})`,
+              position: 'absolute'
+            }}
+          >
+            {this.renderChildren()}
+          </div>
 
-          <LinkManager transform={viewportTr} links={this.props.links} selection={this.state.selection} />
-
-          <RubberBand selection={this.props.selectedItem} viewport={this.state} doRubberMouseDown={this.doRubberMouseDown} />
-
-          <BackGround />
+          <RubberBand selection={this.selection} viewport={this.state} doRubberMouseDown={this.doRubberMouseDown} />
         </div>
       </div>
     );

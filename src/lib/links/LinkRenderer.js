@@ -26,7 +26,7 @@ class LinkRenderer extends Component {
       start == this.props.selection.item && this.props.selection.matrix ? this.props.selection.matrix : new Matrix(start.transform);
     let stCoor = {
       x: startTr.trx + start.w - 10,
-      y: startTr.try + outputIndex * 15 + 42
+      y: startTr.try + outputIndex * 20 + 27
     };
     let endTr = null;
     let enCoor = null;

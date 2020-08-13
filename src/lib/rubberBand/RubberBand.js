@@ -32,7 +32,6 @@ class RubberBand extends Component {
     let coordinates = this.calculateCoordinates();
     const { selection } = this.props;
     if (!selection) return null;
-    if (selection.type != ObjectTypes.TYPE_LINK) return null;
 
     return (
       <svg
